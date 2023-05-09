@@ -2,7 +2,7 @@ from aiogram import types
 from aiogram.dispatcher import FSMContext
 from bot_app.states import GeneralStates
 from . app import dp , bot
-from . keyboards import inline_kb, kb_kin_q
+from . keyboards import inline_kb, kb_kin_q, kb_kin_d
 from . kinolog_form import k_form
 
 
@@ -23,6 +23,10 @@ async def button_click_callback(callback_query:types.CallbackQuery, state:FSMCon
     answer = callback_query.data
     k_form.append(answer)
     await bot.send_message(callback_query.from_user.id, k_form)
-    await bot.send_message(callback_query.from_user.id, 'Question 1', reply_markup=kb_kin_q)
+    await bot.send_message(callback_query.from_user.id, 'Choose time', reply_markup=kb_kin_d)
 
-
+@dp.callback_query_handler()
+async def callback_choose_time(callback_query:types.CallbackQuery, state:FSMContext):
+    await bot.answer_callback_query(callback_query.id)
+    answer = callback_query.data
+    await bot.send_message(callback_query.from_user.id, f'The time {answer} was chosen successfully')

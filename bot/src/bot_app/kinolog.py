@@ -3,7 +3,7 @@ from aiogram.dispatcher import FSMContext
 from bot_app.states import GeneralStates
 from . app import dp , bot
 from . keyboards import inline_kb, kb_kin_q, kb_kin_d
-from . kinolog_form import k_form
+from . kinolog_form import k_form, k_interview
 
 
 @dp.callback_query_handler(lambda c: c.data in ['kinolog'])
@@ -29,4 +29,19 @@ async def button_click_callback(callback_query:types.CallbackQuery, state:FSMCon
 async def callback_choose_time(callback_query:types.CallbackQuery, state:FSMContext):
     await bot.answer_callback_query(callback_query.id)
     answer = callback_query.data
-    await bot.send_message(callback_query.from_user.id, f'The time {answer} was chosen successfully')
+    if bool(k_interview)==False:
+        k_interview.append(answer)
+    else:
+        k_interview.clear()
+        k_interview.append(answer)
+    await bot.send_message(callback_query.from_user.id, f'The time {answer} was chosen successfully\n Check your /interview')
+
+@dp.message_handler(commands=['interview'])
+async def interview_time(message:types.Message):
+    await message.answer(f'Your interview is {k_interview}. /change_time')
+
+@dp.message_handler(commands=['change_time'])
+async def change_time(message:types.Message):
+    await message.answer('Choose time', reply_markup=kb_kin_d)
+
+    
